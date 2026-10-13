@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Present Company: gift ideas from what they already love</title>
+<meta name="description" content="Describe the person you're buying for. Qloo's taste graph finds what fans of their favourite things also love, and turns it into gift ideas.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Figtree:ital,wght@0,400;0,500;0,600;0,800;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 13h20v14H6z" fill="var(--kraft)" stroke="var(--ink)" stroke-width="2"/><path d="M4 9h24v5H4z" fill="var(--ribbon)" stroke="var(--ink)" stroke-width="2"/><path d="M16 9v18" stroke="var(--ink)" stroke-width="2"/><path d="M16 9c-3-6-9-4-6 0m6 0c3-6 9-4 6 0" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>Present Company</a>
+  <span class="powered">Taste data from <a href="https://www.qloo.com" target="_blank" rel="noopener">Qloo</a></span>
+</header>
+
+<main>
+  <section class="ask" aria-labelledby="askTitle">
+    <h1 id="askTitle">Who are you buying for?</h1>
+    <p class="lede">Tell me what they love: bands, shows, books, games, brands, hobbies. Qloo's taste graph finds what fans of those things also love, and I'll turn that into gift ideas.</p>
+    <form id="askForm" class="tag-big">
+      <span class="hole" aria-hidden="true"></span>
+      <label for="brief" class="hand">To: someone who loves…</label>
+      <textarea id="brief" name="brief" rows="4" maxlength="1200" required placeholder="My brother, 30s. Loves AC/DC, Bluey with his kids, and fishing off the rock wall. Lives in Mackay. About $80 for his birthday."></textarea>
+      <div class="ask-row">
+        <div class="examples" aria-label="Try an example">
+          <button type="button" class="ex" data-brief="My mum loves Agatha Christie, The Great British Bake Off and gardening. Around $60 for Mother's Day.">Mum, a mystery reader</button>
+          <button type="button" class="ex" data-brief="A teenage nephew into Minecraft, Taylor Swift and skateboarding. Under $50 for Christmas.">Teen nephew, gamer</button>
+          <button type="button" class="ex" data-brief="A coworker who loves Formula 1, Anthony Bourdain and craft beer. Lives in Brisbane. Secret Santa, $30.">Secret Santa, $30</button>
+        </div>
+        <button id="go" class="go" type="submit">Find gift ideas</button>
+      </div>
+      <p class="privacy">Only the favourites you list are sent to Qloo, never names.</p>
+    </form>
+  </section>
+
+  <section id="work" class="work" hidden aria-live="polite">
+    <div class="work-head">
+      <h2>Working on it</h2>
+      <button type="button" id="traceToggle" class="link" aria-expanded="false" aria-controls="trace">Show Qloo calls</button>
+    </div>
+    <ol id="steps" class="steps"></ol>
+    <div id="trace" class="trace" hidden></div>
+  </section>
+
+  <section id="results" class="results" hidden>
+    <div id="understood" class="understood"></div>
+    <p id="intro" class="intro"></p>
+    <div id="tags" class="tags"></div>
+    <div class="refine" id="refine">
+      <span>Steer it:</span>
+      <button type="button" class="chip" data-tweak="Cheaper: keep everything under about half the budget.">Cheaper</button>
+      <button type="button" class="chip" data-tweak="More experiences and things to do, fewer physical items.">More experiences</button>
+      <button type="button" class="chip" data-tweak="Less obvious: favour surprising picks over the most popular ones.">Less obvious</button>
+      <form id="tweakForm" class="tweak"><label class="sr" for="tweak">Something else</label><input id="tweak" placeholder="Or say what to change…" maxlength="200"><button class="chip" type="submit">Update</button></form>
+    </div>
+  </section>
+
+  <section id="check" class="check" hidden aria-labelledby="checkTitle">
+    <h2 id="checkTitle">Already have a few ideas?</h2>
+    <p>List up to ten of the same kind and Qloo will rank them by how well they match this person's tastes.</p>
+    <form id="checkForm">
+      <div class="check-grid">
+        <label for="opts">One per line</label>
+        <textarea id="opts" rows="4" placeholder="Stephen King&#10;Lee Child&#10;Richard Osman"></textarea>
+        <label for="optType">They're all</label>
+        <select id="optType">
+          <option value="book">books</option><option value="brand">brands</option><option value="artist">musicians</option>
+          <option value="movie">films</option><option value="tv_show">TV shows</option><option value="videogame">video games</option>
+          <option value="podcast">podcasts</option><option value="place">places</option>
+        </select>
+      </div>
+      <button class="go small" type="submit">Rank my ideas</button>
+    </form>
+    <ol id="ranked" class="ranked"></ol>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Recommendations use <a href="https://www.qloo.com" target="_blank" rel="noopener">Qloo</a>'s taste graph, which describes what fans of something tend to like overall. It doesn't know the person, so trust your own judgement. Prices are rough Australian estimates.</p>
+  <p>Built for the Qloo Agentic Hackathon. <a href="https://github.com/Straya-United/present-company" target="_blank" rel="noopener">Source on GitHub</a></p>
+</footer>
+
+<template id="tagTpl">
+  <article class="tag">
+    <span class="hole" aria-hidden="true"></span>
+    <div class="tag-top">
+      <img class="pic" alt="" loading="lazy" referrerpolicy="no-referrer">
+      <div>
+        <p class="kind"></p>
+        <h3 class="gift"></h3>
+        <p class="price"></p>
+      </div>
+    </div>
+    <p class="why"></p>
+    <div class="evidence">
+      <p class="match"></p>
+      <div class="meter" role="img"><span></span></div>
+      <p class="because"></p>
+    </div>
+    <a class="find" target="_blank" rel="noopener">Find it</a>
+  </article>
+</template>
+
+<script src="/app.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "present-company",
+  "version": "1.0.0",
+  "description": "Gift ideas from taste: describe someone, and Qloo's taste graph finds what fans of their favourite things also love.",
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=22.19.0" },
+  "scripts": {
+    "start": "node server.mjs",
+    "dev:mock": "QLOO_MOCK=1 LLM_MOCK=1 node server.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@qloo/qloo-harness": "0.1.26"
+  }
+}
