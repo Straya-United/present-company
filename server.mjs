@@ -43,7 +43,7 @@ async function body(req, limit = 8000) {
 }
 const json = (res, code, obj) => { res.writeHead(code, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' }); res.end(JSON.stringify(obj)); };
 const ipOf = (req) => (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || 'local';
-const publicError = (e) => /QLOO_AUTH|401|403/.test(String(e.message)) ? 'Qloo access problem on the server.' : /rate|429/i.test(String(e.message)) ? 'Busy right now, please try again in a minute.' : 'Something went wrong. Please try again.';
+const publicError = (e) => /^model error (401|403)|OPENAI_API_KEY/.test(String(e.message)) ? 'AI model access problem on the server.' : /QLOO_AUTH|401|403/.test(String(e.message)) ? 'Qloo access problem on the server.' : /rate|429/i.test(String(e.message)) ? 'Busy right now, please try again in a minute.' : 'Something went wrong. Please try again.';
 
 async function serveStatic(req, res) {
   const url = new URL(req.url, 'http://x');
