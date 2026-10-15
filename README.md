@@ -4,6 +4,8 @@
 
 Built for the [Qloo Agentic Hackathon](https://qloo.devpost.com/).
 
+**Live demo:** https://present-company-jhvg.onrender.com (free Render instance: the first visit after a quiet spell can take up to a minute to wake).
+
 ## How it works
 
 ```
@@ -24,7 +26,7 @@ Built for the [Qloo Agentic Hackathon](https://qloo.devpost.com/).
 ```
 
 - **Qloo is the engine, not decoration.** Gift ideas only come from entities Qloo returned for this person's tastes. The server checks every idea against the candidate list, and the page shows the Qloo match, its affinity score and which favourite it links to.
-- **Agentic, but bounded.** The model plans which Qloo searches to run and writes the final list. Qloo calls run in parallel, retry once without vague "vibe" tags if they make a request ambiguous, and stream to the page live (open **Show Qloo calls**).
+- **Agentic, but bounded.** The model plans which Qloo searches to run and writes the final list. Qloo calls run in parallel and stream to the page live (open **Show Qloo calls**). When Qloo says a name is ambiguous, the agent takes its most popular candidate. When a request still fails, it loosens step by step: first the age group, then vague "vibe" tags, then extra favourites.
 - **Check my ideas.** Already have a shortlist? `qloo_rank` scores your own options against the same taste profile.
 - **Steer it.** Cheaper, more experiences, less obvious, or your own words. The list is rewritten from the same Qloo results without new searches.
 
@@ -55,6 +57,8 @@ npm test                # agent tests against the mock layer
 
 # live
 export QLOO_API_KEY=...      # event-issued Qloo key
+export QLOO_BASE_URL=https://hackathon.api.qloo.com          # default
+export QLOO_TRUSTED_BASE_URL=https://hackathon.api.qloo.com
 export OPENAI_API_KEY=...    # language model for planning and writing
 npm start
 ```
