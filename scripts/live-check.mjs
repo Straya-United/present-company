@@ -7,8 +7,10 @@ for (const f of ['etsy-factory.env', 'qloo.env']) {
   const p = `${SECRETS}/${f}`;
   if (!fs.existsSync(p)) continue;
   for (const line of fs.readFileSync(p, 'utf8').split(/\r?\n/)) {
-    const m = line.match(/^\s*(OPENAI_API_KEY|QLOO_API_KEY)\s*=\s*"?([^"\s]+)"?/);
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2];
+    const m = line.match(/^\s*(OPENAI_API_KEY|QLOO_API_KEY|QLOO_API_URL)\s*=\s*"?([^"\s]+)"?/);
+    if (!m) continue;
+    const key = m[1] === 'QLOO_API_URL' ? 'QLOO_BASE_URL' : m[1];
+    if (!process.env[key]) process.env[key] = m[2];
   }
 }
 const args = process.argv.slice(2);

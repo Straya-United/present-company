@@ -35,7 +35,7 @@ Read the user's description of the person they're buying for and return a search
 - loves: named cultural things the person likes that Qloo can know: bands/artists, books, authors, films, TV shows, games, brands, podcasts, public figures, places. Use the canonical title (e.g. "AC/DC", "Bluey"). Max 8. Never include private people.
 - vibes: hobbies, styles and moods that aren't named entities ("fishing", "camping", "cosy", "true crime"). Max 5, short phrases.
 - avoid: anything they said to avoid.
-- demographic: only if the text states an age group or gender in a way Qloo understands ("men 25-34", "teenage girls", "retirees"); else null. Don't guess.
+- demographic: only if the text states the person's age or age group. Write it as gender (if known) plus one Qloo age bracket: "35 and younger", "36 to 55", "55 and older", or a range like "men 25-34", "women 55+". Never words like "teenage", "30s" or "retirees". Else null. Don't guess.
 - location: a city/region only if given (used to find local experiences); else null.
 - budget_min_aud / budget_max_aud: in Australian dollars if given; else null.
 - occasion: if given; else null.
@@ -110,11 +110,17 @@ async function recommendOne(search, plan, signalIds, emit) {
   if (!args.signals && !args.signal_tags && !args.demographic) return { search, skipped: 'nothing to search on' };
   let r = await qloo('qloo_recommend', args);
   emit({ step: 'qloo', ...traceOf(r) });
-  // A vague vibe can make the whole request ambiguous; retry once on the resolved entities alone.
-  if ((r.status === 'needs_input' || r.status === 'error' || r.status === 'empty') && args.signal_tags && args.signals) {
-    const { signal_tags, signal_tags_operator, ...rest } = args;
-    r = await qloo('qloo_recommend', rest);
-    emit({ step: 'qloo', ...traceOf(r), retry: true });
+  // Loosen step by step: an unresolvable demographic, then vague vibe tags, can sink the whole request.
+  const bad = (x) => x.status === 'needs_input' || x.status === 'error' || x.status === 'empty';
+  let cur = args;
+  for (const drop of [['demographic'], ['signal_tags', 'signal_tags_operator']]) {
+    if (!bad(r) || !(drop[0] in cur)) continue;
+    const next = { ...cur };
+    for (const k of drop) delete next[k];
+    if (!next.signals && !next.signal_tags && !next.demographic) break;
+    cur = next;
+    r = await qloo('qloo_recommend', cur);
+    emit({ step: 'qloo', ...traceOf(r), retry: true, dropped: drop[0] });
   }
   return { search, envelope: r, entities: entitiesOf(r) };
 }
@@ -207,8 +213,13 @@ export async function checkShortlist(session, options, optionType, emit = () => 
   const args = { options: options.slice(0, 10), option_type: optionType };
   if (signals.length) args.signals = signals;
   if (session.plan.demographic) args.demographic = session.plan.demographic;
-  const r = await qloo('qloo_rank', args);
+  let r = await qloo('qloo_rank', args);
   emit({ step: 'qloo', ...traceOf(r) });
+  if ((r.status === 'needs_input' || r.status === 'error') && args.demographic) {
+    delete args.demographic;
+    r = await qloo('qloo_rank', args);
+    emit({ step: 'qloo', ...traceOf(r), retry: true, dropped: 'demographic' });
+  }
   const ranked = entitiesOf(r).map((e) => ({ name: e.name, input: e.input || null, affinity: e.affinity ?? null, image: imageOf(e), type: short(e.type) }));
   return { status: r.status, summary: r.summary, ranked, interpretation: r.interpretation || null };
 }
