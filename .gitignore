@@ -4,3 +4,4 @@ node_modules/
 shots/
 *.err
 scripts/qloo-probe*.mjs
+scripts/remote-check.mjs

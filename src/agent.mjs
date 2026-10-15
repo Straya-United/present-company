@@ -122,6 +122,12 @@ async function recommendOne(search, plan, signalIds, emit) {
     r = await qloo('qloo_recommend', cur);
     emit({ step: 'qloo', ...traceOf(r), retry: true, dropped: drop[0] });
   }
+  // Last resort: one odd signal entity can sink a category, so fall back to the first two favourites.
+  if (bad(r) && cur.signals?.length > 2) {
+    cur = { ...cur, signals: cur.signals.slice(0, 2) };
+    r = await qloo('qloo_recommend', cur);
+    emit({ step: 'qloo', ...traceOf(r), retry: true, dropped: 'extra signals' });
+  }
   return { search, envelope: r, entities: entitiesOf(r) };
 }
 
