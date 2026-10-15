@@ -62,6 +62,8 @@ function renderIdeas(result) {
     if (idea.qloo.image) pic.src = idea.qloo.image; else noPic();
     pic.addEventListener('error', noPic);
     el.querySelector('.kind').textContent = KIND_WORDS[idea.kind] || 'A gift';
+    // The model sometimes italicises titles with markdown; show plain text.
+    idea.gift = String(idea.gift).replace(/\*+/g, ''); idea.why = String(idea.why).replace(/\*+/g, '');
     el.querySelector('.gift').textContent = idea.gift;
     el.querySelector('.price').textContent = idea.price_low_aud === idea.price_high_aud ? `about ${aud(idea.price_low_aud)}` : `about ${aud(idea.price_low_aud)}–${aud(idea.price_high_aud)}`;
     el.querySelector('.why').textContent = idea.why;
@@ -127,6 +129,15 @@ async function refine(tweak) {
   finally { document.querySelectorAll('#refine button').forEach((b) => (b.disabled = false)); }
 }
 document.querySelectorAll('#refine .chip[data-tweak]').forEach((b) => b.addEventListener('click', () => refine(b.dataset.tweak)));
+// Qloo ranks titles of the chosen kind, so show matching examples (a book list wants book titles, not authors).
+const OPT_EXAMPLES = {
+  book: 'The Thursday Murder Club\nThe Secret Garden\nRebecca', brand: 'KitchenAid\nLe Creuset\nSmeg', artist: 'Cold Chisel\nMidnight Oil\nINXS',
+  movie: 'Knives Out\nPaddington 2\nThe Castle', tv_show: 'Midsomer Murders\nVera\nDeath in Paradise', videogame: 'Stardew Valley\nMario Kart 8\nTerraria',
+  podcast: 'No Such Thing As A Fish\nYou\'re Dead to Me\nCasefile', place: 'Bunnings\nThe Rabbit Hole\nHarrup Park',
+};
+const optType = $('#optType');
+const setOptExample = () => { $('#opts').placeholder = OPT_EXAMPLES[optType.value] || ''; };
+optType.addEventListener('change', setOptExample); setOptExample();
 $('#tweakForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#tweak').value.trim(); if (v) refine(v); });
 
 $('#checkForm').addEventListener('submit', async (e) => {
