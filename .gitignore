@@ -5,3 +5,4 @@ shots/
 *.err
 scripts/qloo-probe*.mjs
 scripts/remote-check.mjs
+scripts/devpost-shots.mjs
